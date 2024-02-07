@@ -24,6 +24,7 @@ public class AuctionServiceHttpClient
 
       var auctionServiceUrl = _config.GetValue<string>("AuctionServiceUrl");  
 
+      //here we can deserialize directly into Item type (because its structure matches AuctionDto in AuctionService)
       var items = await _httpClient.GetFromJsonAsync<List<Item>>($"{auctionServiceUrl}/api/auctions?date={lastUpdated}");  
 
       return items;  

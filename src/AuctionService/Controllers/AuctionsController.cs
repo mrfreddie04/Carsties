@@ -8,6 +8,8 @@ using AutoMapper;
 using AuctionService.Data;
 using AuctionService.DTOs;
 using AutoMapper.QueryableExtensions;
+using Contracts;
+using MassTransit;
 
 namespace AuctionService.Controllers
 {
@@ -17,11 +19,13 @@ namespace AuctionService.Controllers
   {
     private readonly AuctionDbContext _context;
     private readonly IMapper _mapper;
+    private readonly IPublishEndpoint _publishEndpoint;
 
-    public AuctionsController(AuctionDbContext context, IMapper mapper )
+    public AuctionsController(AuctionDbContext context, IMapper mapper, IPublishEndpoint publishEndpoint)
     {
       _context = context;
       _mapper = mapper;
+      _publishEndpoint = publishEndpoint;
     }
 
     [HttpGet]
@@ -63,29 +67,39 @@ namespace AuctionService.Controllers
     }
 
     [HttpPost]
-    public async Task<ActionResult<AuctionDto>> CreateAuction([FromBody] CreateAuctionDto auctionDto)
+    public async Task<ActionResult<AuctionDto>> CreateAuction([FromBody] CreateAuctionDto createAuctionDto)
     {
       //Map dto to Auction entity
-      var auction = _mapper.Map<Auction>(auctionDto);
+      var auction = _mapper.Map<Auction>(createAuctionDto);
       
       //TODO: add current user as seller
       auction.Seller = "test";      
 
-      //track this object in memory 
+      //track this object in memory
       _context.Auctions.Add(auction);
 
+      var auctionDto = _mapper.Map<AuctionDto>(auction);
+
+      //publish message to all subscribed consumers for the message type (Contracts.AuctionCreated)
+      //with outbox - messages are first stored to the DB, so the Publish method is effectively
+      //writing to Outox and as such it becomes a part of our EF Transaction, hence we must execute it before
+      //we save the changes to the DB
+      var auctionCreated = _mapper.Map<AuctionCreated>(auctionDto);
+      await _publishEndpoint.Publish(auctionCreated);      
+
+      //ID assigned here
       var result = await _context.SaveChangesAsync() > 0;
       if(!result) return BadRequest("Could not save changes to the DB");
 
       return CreatedAtAction(
         nameof(GetAuctionById), 
         new {Id = auction.Id},
-        _mapper.Map<AuctionDto>(auction)
+        auctionDto
       );
     }
 
     [HttpPut("{id:Guid}")]
-    public async Task<ActionResult> UpdateAuction([FromRoute] Guid id, [FromBody] UpdateAuctionDto auctionDto)
+    public async Task<ActionResult> UpdateAuction([FromRoute] Guid id, [FromBody] UpdateAuctionDto updateAuctionDto)
     {
       //check if exists
       var auction = await _context.Auctions
@@ -97,11 +111,16 @@ namespace AuctionService.Controllers
       //TODO: check the seller name matches the user name
 
       //update auction object
-      auction.Item.Make = auctionDto.Make ?? auction.Item.Make;
-      auction.Item.Model = auctionDto.Model ?? auction.Item.Model;
-      auction.Item.Color = auctionDto.Color ?? auction.Item.Color;
-      auction.Item.Year = auctionDto.Year ?? auction.Item.Year;
-      auction.Item.Mileage = auctionDto.Mileage ?? auction.Item.Mileage;
+      auction.Item.Make = updateAuctionDto.Make ?? auction.Item.Make;
+      auction.Item.Model = updateAuctionDto.Model ?? auction.Item.Model;
+      auction.Item.Color = updateAuctionDto.Color ?? auction.Item.Color;
+      auction.Item.Year = updateAuctionDto.Year ?? auction.Item.Year;
+      auction.Item.Mileage = updateAuctionDto.Mileage ?? auction.Item.Mileage;
+
+      //publish to message bus
+      //var auctionDto = _mapper.Map<AuctionDto>(auction);
+      var auctionUpdated = _mapper.Map<AuctionUpdated>(auction);
+      await _publishEndpoint.Publish(auctionUpdated);
 
       //update auction
       var result = await _context.SaveChangesAsync() > 0;
@@ -123,6 +142,12 @@ namespace AuctionService.Controllers
 
       //Mark as deleted
       _context.Auctions.Remove(auction);   
+
+      //publish to message bus
+      var auctionDeleted = new AuctionDeleted() {
+        Id = auction.Id.ToString()
+      };
+      await _publishEndpoint.Publish(auctionDeleted);
 
       //Delete from DB
       var result = await _context.SaveChangesAsync() > 0;
