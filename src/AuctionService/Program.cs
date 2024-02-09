@@ -3,6 +3,7 @@ using AutoMapper;
 using AuctionService.Data;
 using MassTransit;
 using AuctionService.Consumers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,8 +38,17 @@ builder.Services.AddMassTransit( options => {
   });
 });
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer( options =>
+{
+  options.Authority = builder.Configuration.GetValue<string>("IdentityServiceUrl");
+  options.RequireHttpsMetadata = false;
+  options.TokenValidationParameters.ValidateAudience = false;
+  options.TokenValidationParameters.NameClaimType = "username"; //which claim from the token to use as User Name
+});
+
 var app = builder.Build();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 //map controllers - direct http requests to correct api endpoint
