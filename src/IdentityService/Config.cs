@@ -28,7 +28,19 @@ public static class Config
         RedirectUris = { "https://www.getpostman.com/oauth2/callback" },
         ClientSecrets = new[] { new Secret("NotASecret".Sha256())},
         AllowedGrantTypes = { GrantType.ResourceOwnerPassword }
-      }
+      },
+      new Client() 
+      {
+        ClientId = "nextApp",
+        ClientName = "nextApp",
+        AllowedScopes = { "openid", "profile", "auctionApp" },
+        RequirePkce = false, //PKCE is used for mobile apps, 
+        RedirectUris = { "http://localhost:3000/api/auth/callback/id-server" },
+        ClientSecrets = { new Secret("secret".Sha256())},
+        AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
+        AllowOfflineAccess = true,
+        AccessTokenLifetime = 3600 * 24 * 30
+      }      
       // machine-to-machine - use this client for internal services to give them a token, to authenticate internally to another service
       // we will not use it
       // m2m client credentials flow client
