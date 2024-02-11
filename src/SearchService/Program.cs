@@ -38,6 +38,11 @@ builder.Services.AddMassTransit( options =>
       e.ConfigureConsumer<AuctionCreatedConsumer>(context); //apply to AuctionCreatedConsumer consumer
     });
 
+    cfg.Host(builder.Configuration["RabbitMq:Host"], "/", host => {
+      host.Username(builder.Configuration.GetValue("RabbitMq:Username","guest"));
+      host.Password(builder.Configuration.GetValue("RabbitMq:Password","guest"));
+    });    
+
     //configure endpoints for all defined consumers - automatically assigning names to the queues
     cfg.ConfigureEndpoints(context);
   });

@@ -33,7 +33,12 @@ builder.Services.AddMassTransit( options => {
     o.UseBusOutbox();
   });
 
-  options.UsingRabbitMq( (context,cfg) => {
+  options.UsingRabbitMq( (context,cfg) => 
+  {
+    cfg.Host(builder.Configuration["RabbitMq:Host"], "/", host => {
+      host.Username(builder.Configuration.GetValue("RabbitMq:Username","guest"));
+      host.Password(builder.Configuration.GetValue("RabbitMq:Password","guest"));
+    });
     cfg.ConfigureEndpoints(context);
   });
 });
