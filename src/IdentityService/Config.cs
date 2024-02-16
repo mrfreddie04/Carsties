@@ -39,7 +39,8 @@ public static class Config
         ClientSecrets = { new Secret("secret".Sha256())},
         AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
         AllowOfflineAccess = true,
-        AccessTokenLifetime = 3600 * 24 * 30
+        AccessTokenLifetime = 3600 * 24 * 30,
+        AlwaysIncludeUserClaimsInIdToken = true,
       }      
       // machine-to-machine - use this client for internal services to give them a token, to authenticate internally to another service
       // we will not use it

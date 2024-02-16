@@ -17,6 +17,14 @@ export type Auction = {
   id: string
 };
 
+export type AuctionUpdate = {
+  make: string,
+  model: string,
+  year: number
+  color: string,
+  mileage: number
+};
+
 export type PagedResult<T> = {
   results: T[],
   totalCount: number,

@@ -29,8 +29,8 @@ export default function Listings() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getData(query);
-      setData(data);
+      const result = await getData(query);
+      setData(result);
     }
     fetchData();
   }, [query]);
