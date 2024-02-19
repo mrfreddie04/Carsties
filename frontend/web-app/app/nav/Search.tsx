@@ -4,8 +4,11 @@ import React from 'react'
 import { FaSearch } from "react-icons/fa";
 import { useParamsStore } from '@/hooks/useParamsStore';
 import { useShallow } from 'zustand/react/shallow';
+import { usePathname, useRouter } from 'next/navigation';
 
 export default function Search() {  
+  const router = useRouter();
+  const pathName = usePathname();
   const {
     searchValue,
     setSearchValue,
@@ -16,7 +19,10 @@ export default function Search() {
     setParams: state.setParams
   })));
 
-  const search = () => setParams({searchTerm:searchValue});
+  const search = () => {
+    setParams({searchTerm:searchValue});
+    if(pathName !== "/") router.push("/");
+  } 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchValue(e.target.value);
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if(e.key === "Enter") search();

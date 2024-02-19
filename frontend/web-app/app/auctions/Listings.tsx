@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow'
 import qs from 'query-string';
 import AuctionCard from './AuctionCard';
-import { Auction, PagedResult } from '@/types';
+import { Auction, FetchError, PagedResult, isFetchError } from '@/types';
 import { useParamsStore } from '@/hooks/useParamsStore';
 import AppPagination from '../components/AppPagination';
 import { getData } from '../actions/auctionActions';
@@ -12,18 +12,22 @@ import Filters from './Filters';
 import EmptyFilter from '../components/EmptyFilter';
 
 export default function Listings() {
-  const [data, setData] = useState<PagedResult<Auction>>();
+  const [data, setData] = useState<PagedResult<Auction> | FetchError>();
   const params = useParamsStore(useShallow(state => ({
     pageNumber: state.pageNumber, 
     pageSize: state.pageSize, 
     orderBy: state.orderBy,
     filterBy: state.filterBy,
-    searchTerm: state.searchTerm
+    searchTerm: state.searchTerm,
+    seller: state.seller,
+    winner: state.winner
   })));
   const setParams = useParamsStore(state => state.setParams);
   const query = qs.stringifyUrl({
     url: "", query: params
   });
+
+  //Object.values(params).map( ([k,v]) => `${k}=${v}`).join('&');
 
   const setPageNumber = (pageNumber: number) => setParams({pageNumber});
 
@@ -36,6 +40,8 @@ export default function Listings() {
   }, [query]);
 
   if(!data) return (<h3>Loading...</h3>)
+
+  if(isFetchError(data)) return (<h3>Error...</h3>)
   
   return (
     <>
