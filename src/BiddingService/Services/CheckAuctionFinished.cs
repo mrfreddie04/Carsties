@@ -1,6 +1,4 @@
-﻿
-using AutoMapper;
-using BiddingService.Models;
+﻿using BiddingService.Models;
 using Contracts;
 using MassTransit;
 using MongoDB.Entities;

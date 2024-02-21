@@ -22,11 +22,11 @@ COPY src/NotificationService/NotificationService.csproj ./src/NotificationServic
 RUN dotnet restore Carsties.sln
 
 # Copy app src files 
-COPY src/AuctionService ./src/AuctionService
+COPY src/NotificationService ./src/NotificationService
 COPY src/Contracts ./src/Contracts
 
-# Switch to AuctionService project directory & build the project in the release mode
-WORKDIR /app/src/AuctionService
+# Switch to GatewayService project directory & build the project in the release mode
+WORKDIR /app/src/NotificationService
 RUN dotnet publish -c Release -o /app/src/out
 
 # Build runtime image - switch to dotnet runtime base image (smaller & faster then sdk)
@@ -35,5 +35,5 @@ FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS release
 WORKDIR /app
 COPY --from=build /app/src/out .
 
-# Startup command - start Auction Service
-ENTRYPOINT ["dotnet", "AuctionService.dll"]
+# Startup command - start Gateway Service
+ENTRYPOINT ["dotnet", "NotificationService.dll"]
