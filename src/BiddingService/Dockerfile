@@ -21,11 +21,11 @@ COPY src/BiddingService/BiddingService.csproj ./src/BiddingService/BiddingServic
 RUN dotnet restore Carsties.sln
 
 # Copy app src files 
-COPY src/SearchService ./src/SearchService
+COPY src/BiddingService ./src/BiddingService
 COPY src/Contracts ./src/Contracts
 
-# Switch to SearchService project directory & build the project in the release mode
-WORKDIR /app/src/SearchService
+# Switch to AuctionService project directory & build the project in the release mode
+WORKDIR /app/src/BiddingService
 RUN dotnet publish -c Release -o /app/src/out
 
 # Build runtime image - switch to dotnet runtime base image (smaller & faster then sdk)
@@ -34,5 +34,5 @@ FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS release
 WORKDIR /app
 COPY --from=build /app/src/out .
 
-# Startup command - start Search Service
-ENTRYPOINT ["dotnet", "SearchService.dll"]
+# Startup command - start Auction Service
+ENTRYPOINT ["dotnet", "BiddingService.dll"]

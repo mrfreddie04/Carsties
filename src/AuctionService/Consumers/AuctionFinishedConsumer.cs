@@ -20,7 +20,10 @@ public class AuctionFinishedConsumer : IConsumer<AuctionFinished>
     Console.WriteLine($"--> Consuming auction finished: {context.Message.AuctionId}");
 
     //check if exists
-    var auction = await _dbContext.Auctions.FindAsync(context.Message.AuctionId);
+    if(!Guid.TryParse(context.Message.AuctionId, out var id))
+      throw new MessageException(typeof(AuctionFinished), "Invalid Auction Id"); 
+    
+    var auction = await _dbContext.Auctions.FindAsync(id);
 
     if(auction is null) 
       throw new MessageException(typeof(AuctionFinished), "Auction not found"); 

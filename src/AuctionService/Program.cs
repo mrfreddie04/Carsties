@@ -4,6 +4,7 @@ using AuctionService.Data;
 using MassTransit;
 using AuctionService.Consumers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using AuctionService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +52,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
   options.TokenValidationParameters.NameClaimType = "username"; //which claim from the token to use as User Name
 });
 
+builder.Services.AddGrpc();
+
 var app = builder.Build();
 
 app.UseAuthentication();
@@ -58,6 +61,8 @@ app.UseAuthorization();
 
 //map controllers - direct http requests to correct api endpoint
 app.MapControllers();
+
+app.MapGrpcService<GrpcAuctionService>();
 
 //apply migrations & seed data
 try

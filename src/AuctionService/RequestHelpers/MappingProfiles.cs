@@ -35,5 +35,7 @@ public class MappingProfiles: Profile
       .IncludeMembers( a => a.Item);      
     CreateMap<Item,AuctionUpdated>();
 
+    //CreateMap<Auction,GetAuctionModel>();
+
   }
 }
