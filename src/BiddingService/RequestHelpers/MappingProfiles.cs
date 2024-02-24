@@ -15,7 +15,7 @@ public class MappingProfiles: Profile
     
     CreateMap<Bid,BidPlaced>()
       .ForMember(
-        dest => dest.BidId,
+        dest => dest.Id,
         opt => opt.MapFrom( src => src.ID)
       );    
   }

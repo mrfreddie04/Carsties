@@ -7,7 +7,7 @@ import { Button } from 'flowbite-react';
 import { deleteAuction } from '@/app/actions/auctionActions';
 
 type Props = {
-  id: string
+  id: string;
 }
 
 export default function DeleteButton({id}: Props) {

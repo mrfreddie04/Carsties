@@ -4,7 +4,7 @@ import React, {useState} from 'react'
 import Image from "next/image";
 
 type Props = {
-  imageUrl: string
+  imageUrl: string;
 }
 
 export default function CarImage({imageUrl}: Props) {

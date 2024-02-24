@@ -4,7 +4,7 @@ import {Auction} from "@/types";
 import {Table} from "flowbite-react";
 
 type Props = {
-  auction: Auction
+  auction: Auction;
 }
 
 export default function DetailedSpecs({auction}: Props) {

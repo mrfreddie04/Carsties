@@ -11,7 +11,7 @@ import { AiFillCar, AiFillTrophy, AiOutlineLogout } from 'react-icons/ai';
 import { useParamsStore } from '@/hooks/useParamsStore';
 
 type Props = {
-  user: Session['user']
+  user: Session['user'];
 }
 
 export default function UserActions({user}: Props) {

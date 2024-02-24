@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Button } from 'flowbite-react';
 
 type Props = {
-  id: string
+  id: string;
 }
 
 export default function EditButton({id}: Props) {

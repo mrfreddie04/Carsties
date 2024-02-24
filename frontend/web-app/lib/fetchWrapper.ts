@@ -49,18 +49,26 @@ async function del(url: string, id: string) {
 }
 
 async function handleResponse(response: Response) {
+  const text = await response.text();
+  const data = parseText(text);
+
   if(!response.ok) {
     const error = {
       status: response.status,
-      message: response.statusText
+      message: typeof data === "string" ? data : response.statusText
     };
     return {error};
-    //throw new Error("Failed to fetch data");
   }  
-  const text = await response.text();
-  const data = text && JSON.parse(text);
 
   return data || response.statusText;
+}
+
+function parseText(text: string) {
+  try {
+    return JSON.parse(text);
+  } catch(e) {
+    return text;
+  }  
 }
 
 async function getHeaders() {

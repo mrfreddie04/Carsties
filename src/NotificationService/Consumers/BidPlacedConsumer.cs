@@ -16,7 +16,7 @@ public class BidPlacedConsumer : IConsumer<BidPlaced>
 
   public async Task Consume(ConsumeContext<BidPlaced> context)
   {
-    Console.WriteLine($"--> bid placed message received: {context.Message.BidId}");
+    Console.WriteLine($"--> bid placed message received: {context.Message.Id}");
 
     await _hubContext.Clients.All.SendAsync("BidPlaced", context.Message);
   }

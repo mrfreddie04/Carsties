@@ -2,9 +2,12 @@
 
 import React from 'react';
 import Countdown, { zeroPad } from 'react-countdown'; 
+import { useBidStore } from '@/hooks/useBidStore';
+import { useShallow } from 'zustand/react/shallow';
+import { usePathname } from 'next/navigation';
 
 type Props = {
-  auctionEnd: string
+  auctionEnd: string;
 }
 
 type CountdownStatus = {
@@ -34,11 +37,20 @@ const renderer = ({ days, hours, minutes, seconds, completed }: CountdownStatus)
 };
 
 export default function CountdownTimer({auctionEnd}: Props) {
+  const open = useBidStore(useShallow(state => state.open));
+  const setOpen = useBidStore(state => state.setOpen);
+  const pathname = usePathname();
+
+  const auctionFinished = () => {
+    if(pathname.startsWith("/auctions/details") && open) setOpen(false);
+  }
+
   return (
     <div>
       <Countdown 
         date={new Date(auctionEnd)}
         renderer={renderer}
+        onComplete={auctionFinished} 
       />    
     </div>
   )

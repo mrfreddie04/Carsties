@@ -6,13 +6,22 @@ import qs from 'query-string';
 import AuctionCard from './AuctionCard';
 import { Auction, FetchError, PagedResult, isFetchError } from '@/types';
 import { useParamsStore } from '@/hooks/useParamsStore';
+import { useAuctionStore } from '@/hooks/useAuctionStore';
 import AppPagination from '../components/AppPagination';
 import { getData } from '../actions/auctionActions';
 import Filters from './Filters';
 import EmptyFilter from '../components/EmptyFilter';
 
 export default function Listings() {
-  const [data, setData] = useState<PagedResult<Auction> | FetchError>();
+  //const [data, setData] = useState<PagedResult<Auction> | FetchError>();
+  const [loading, setLoading] = useState(false);
+  const data = useAuctionStore(useShallow(state => ({
+    auctions: state.auctions, 
+    totalCount: state.totalCount, 
+    pageCount: state.pageCount
+  })));
+  const setData = useAuctionStore(state => state.setData);
+
   const params = useParamsStore(useShallow(state => ({
     pageNumber: state.pageNumber, 
     pageSize: state.pageSize, 
@@ -32,14 +41,13 @@ export default function Listings() {
   const setPageNumber = (pageNumber: number) => setParams({pageNumber});
 
   useEffect(() => {
-    const fetchData = async () => {
-      const result = await getData(query);
-      setData(result);
-    }
-    fetchData();
+    setLoading(true);
+    getData(query)
+      .then( data => setData(data))
+      .finally(() => setLoading(false));
   }, [query]);
 
-  if(!data) return (<h3>Loading...</h3>)
+  if(loading) return (<h3>Loading...</h3>)
 
   if(isFetchError(data)) return (<h3>Error...</h3>)
   
@@ -51,7 +59,7 @@ export default function Listings() {
         ) : (
         <>
           <div className='grid grid-cols-4 gap-6'>
-            { data.results.map( (auction) => (
+            { data.auctions.map( (auction) => (
               <AuctionCard key={auction.id} auction={auction}/>
             ))}
           </div>

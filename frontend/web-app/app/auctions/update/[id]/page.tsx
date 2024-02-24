@@ -4,7 +4,7 @@ import Heading from '@/app/components/Heading';
 import AuctionForm from '../../AuctionForm';
 
 type Props = {
-  params: {id:string}
+  params: {id:string};
 };
 
 export default async function Update({params}: Props) {

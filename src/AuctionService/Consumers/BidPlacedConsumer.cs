@@ -15,7 +15,7 @@ public class BidPlacedConsumer : IConsumer<BidPlaced>
 
   public async Task Consume(ConsumeContext<BidPlaced> context)
   {
-    Console.WriteLine($"--> Consuming bid placed: {context.Message.BidId}");
+    Console.WriteLine($"--> Consuming bid placed: {context.Message.Id}");
 
     //check if exists
     if(!Guid.TryParse(context.Message.AuctionId, out var id))

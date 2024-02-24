@@ -1,4 +1,5 @@
 export type Auction = {
+  id: string,
   reservePrice: number,
   seller: string,
   winner?: string,
@@ -13,8 +14,16 @@ export type Auction = {
   year: number
   color: string,
   mileage: number
-  imageUrl: string,
-  id: string
+  imageUrl: string
+};
+
+export type Bid = {
+  id: string,
+  auctionId: string,
+  bidder: string,
+  bidTime: string,
+  amount: number,
+  bidStatus: string
 };
 
 export type AuctionUpdate = {
@@ -25,16 +34,24 @@ export type AuctionUpdate = {
   mileage: number
 };
 
-export type AuctionCreate = {
-  make: string,
-  model: string,
-  year: number
-  color: string,
-  mileage: number,
-  reservePrice: number,
-  imageUrl: string,
-  auctionEnd: string,
+export type AuctionFinished = {
+  auctionId: string;
+  itemSold: boolean,
+  winner?: string,
+  seller: string,
+  soldAmount?: number
 };
+
+// export type AuctionCreate = {
+//   make: string,
+//   model: string,
+//   year: number
+//   color: string,
+//   mileage: number,
+//   reservePrice: number,
+//   imageUrl: string,
+//   auctionEnd: string,
+// };
 
 export type PagedResult<T> = {
   results: T[],
@@ -43,8 +60,10 @@ export type PagedResult<T> = {
 };
 
 export type FetchError = {
-  status: number,
-  message: string
+  error: {
+    status: number,
+    message: string
+  }
 }
 
 export function isFetchError(arg: any): arg is FetchError {
