@@ -41,11 +41,11 @@ export default function BidList({auction, user}: Props) {
         toast.error(err.message);
       })
       .finally(() => setLoading(false));
-  }, [auction.id]);
+  }, [auction.id, setBids]);
 
   useEffect(() => {
     setOpen(openForBids);
-  },[openForBids]);
+  },[openForBids, setOpen]);
 
   if(loading) return (<span>Loading bids...</span>);
 

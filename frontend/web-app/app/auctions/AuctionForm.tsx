@@ -35,7 +35,7 @@ export default function AuctionForm({auction}: Props) {
       const {make, model, year, mileage, color} = auction;
       reset({make, model, year, mileage, color});
     }
-  },[setFocus, auction]);
+  },[setFocus, auction, reset]);
 
   const onSubmit = async (data: FieldValues) => { 
     try {

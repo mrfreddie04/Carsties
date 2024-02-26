@@ -2,7 +2,7 @@
 
 import React, { ReactNode, useEffect, useState } from 'react'
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
-import { usePathname, useSearchParams } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useAuctionStore } from '@/hooks/useAuctionStore';
 import { useBidStore } from '@/hooks/useBidStore';
 import { Auction, AuctionFinished, Bid } from '@/types';
@@ -23,19 +23,26 @@ export default function SignalRProvider({children,user}: Props) {
   const [connection, setConnection] = useState<HubConnection | null>(null);
   const setCurrentPrice = useAuctionStore(state => state.setCurrentPrice);
   const addBid = useBidStore(state => state.addBid);  
+
+  const apiUrl = process.env.NODE_ENV === "production" 
+    ? "https://api.carsties.com/notifications" 
+    : process.env.NEXT_PUBLIC_NOTIFY_URL;
+
   pathname = usePathname();
 
-  //console.log("Render", pathname);
+  // console.log("NEXT_PUBLIC_NOTIFY_URL", process.env.NEXT_PUBLIC_NOTIFY_URL);
+  // console.log("NODE_ENV", process.env.NODE_ENV);
+  // console.log("apiUrl", apiUrl);
 
   useEffect(() => {
     //create connection to SignalR Hub
     const newConnection = new HubConnectionBuilder()
-      .withUrl("http://localhost:6001/notifications")
+      .withUrl(apiUrl!)
       .withAutomaticReconnect()
       .build();
 
     setConnection(newConnection);
-  },[]);
+  },[apiUrl]);
 
   useEffect(() => {
     //connect & subscribe to methods  
@@ -79,7 +86,7 @@ export default function SignalRProvider({children,user}: Props) {
     return () => { 
       if(connection) connection.stop();
     }
-  },[connection])  
+  },[connection, addBid, setCurrentPrice, user?.username])  
   
   return (
     children

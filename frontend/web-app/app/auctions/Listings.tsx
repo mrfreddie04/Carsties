@@ -45,7 +45,7 @@ export default function Listings() {
     getData(query)
       .then( data => setData(data))
       .finally(() => setLoading(false));
-  }, [query]);
+  }, [query, setData]);
 
   if(loading) return (<h3>Loading...</h3>)
 

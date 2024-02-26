@@ -1,4 +1,4 @@
-"use server";
+//"use server";
 
 import React from 'react'
 import { getSession, getTokenWorkaround } from '../actions/authActions';

@@ -1,11 +1,11 @@
-//"use server";
-
-import type { Metadata } from "next";
 import "./globals.css";
+import type { Metadata } from "next";
 import Navbar from "./nav/Navbar";
 import ToasterProvider from "./providers/ToasterProvider";
 import SignalRProvider from "./providers/SignalRProvider";
 import { getCurrentUser } from "./actions/authActions";
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: "Carsties",

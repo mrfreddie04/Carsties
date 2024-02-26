@@ -4,6 +4,12 @@ namespace IdentityService;
 
 public static class Config
 {
+  // private static IConfiguration _config;
+  // public static void ConfigSetup(IConfiguration config)
+  // {
+  //   _config = config;
+  // }
+
   public static IEnumerable<IdentityResource> IdentityResources =>
     new IdentityResource[]
     {
@@ -17,7 +23,7 @@ public static class Config
         new ApiScope("auctionApp", "Auction app full access")
     };
 
-  public static IEnumerable<Client> Clients =>
+  public static IEnumerable<Client> Clients(IConfiguration config) =>
     new Client[]
     {
       new Client() 
@@ -35,13 +41,17 @@ public static class Config
         ClientName = "nextApp",
         AllowedScopes = { "openid", "profile", "auctionApp" },
         RequirePkce = false, //PKCE is used for mobile apps, 
-        RedirectUris = { "http://localhost:3000/api/auth/callback/id-server" },
+        RedirectUris = { $"{config.GetValue<string>("ClientApp")}/api/auth/callback/id-server" },
         ClientSecrets = { new Secret("secret".Sha256())},
         AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
         AllowOfflineAccess = true,
         AccessTokenLifetime = 3600 * 24 * 30,
         AlwaysIncludeUserClaimsInIdToken = true,
       }      
+    };
+}
+
+
       // machine-to-machine - use this client for internal services to give them a token, to authenticate internally to another service
       // we will not use it
       // m2m client credentials flow client
@@ -71,5 +81,3 @@ public static class Config
       //   AllowOfflineAccess = true,
       //   AllowedScopes = { "openid", "profile", "scope2" }
       // },
-    };
-}

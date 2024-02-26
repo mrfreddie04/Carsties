@@ -9,8 +9,18 @@ const nextConfig = {
     },
   },
   images: {
-    domains: ["cdn.pixabay.com"]
-  }
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cdn.pixabay.com',
+        pathname: '**',
+        port: ''
+      },
+    ],    
+    // domains: ["cdn.pixabay.com"]
+  },
+  //output: 'export'
+  output: "standalone",
 };
 
 export default nextConfig;
