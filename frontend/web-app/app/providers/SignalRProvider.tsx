@@ -30,10 +30,6 @@ export default function SignalRProvider({children,user}: Props) {
 
   pathname = usePathname();
 
-  // console.log("NEXT_PUBLIC_NOTIFY_URL", process.env.NEXT_PUBLIC_NOTIFY_URL);
-  // console.log("NODE_ENV", process.env.NODE_ENV);
-  // console.log("apiUrl", apiUrl);
-
   useEffect(() => {
     //create connection to SignalR Hub
     const newConnection = new HubConnectionBuilder()

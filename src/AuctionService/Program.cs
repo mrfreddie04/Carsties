@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using AutoMapper;
-using AuctionService.Data;
-using MassTransit;
-using AuctionService.Consumers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using AutoMapper;
+using MassTransit;
+using AuctionService.Data;
+using AuctionService.Consumers;
 using AuctionService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -54,6 +54,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 builder.Services.AddGrpc();
 
+builder.Services.AddScoped<IAuctionRepository,AuctionRepository>();
+
 var app = builder.Build();
 
 app.UseAuthentication();
@@ -76,3 +78,5 @@ catch(Exception e)
 }
 
 app.Run();
+
+public partial class Program { }

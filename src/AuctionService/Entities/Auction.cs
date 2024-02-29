@@ -1,3 +1,5 @@
+using Google.Protobuf.WellKnownTypes;
+
 namespace AuctionService.Entities;
 
 public class Auction
@@ -15,4 +17,6 @@ public class Auction
 
   //nav props
   public Item Item { get; set; }
+
+  public bool HasReservePrice() => ReservePrice > 0;  
 }

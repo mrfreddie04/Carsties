@@ -5,7 +5,7 @@ import ToasterProvider from "./providers/ToasterProvider";
 import SignalRProvider from "./providers/SignalRProvider";
 import { getCurrentUser } from "./actions/authActions";
 
-export const dynamic = 'force-dynamic';
+//export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: "Carsties",

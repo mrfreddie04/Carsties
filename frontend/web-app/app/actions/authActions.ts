@@ -3,6 +3,7 @@ import { authOptions } from "../api/auth/[...nextauth]/authOptions";
 import { getToken } from "next-auth/jwt";
 import { cookies, headers } from "next/headers";
 import { NextApiRequest } from "next";
+import { DynamicServerError } from "next/dist/client/components/hooks-server-context";
 
 //export type AppUser = User & { username: string};
 
@@ -18,6 +19,7 @@ export async function getCurrentUser() {
     if(!session) return null;
     return session.user;
   } catch(e) {
+    if(e instanceof DynamicServerError) throw e;
     console.log(e);
     return null;
   }
