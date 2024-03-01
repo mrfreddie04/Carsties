@@ -1,4 +1,6 @@
 ﻿using IdentityService;
+using Npgsql;
+using Polly;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -29,7 +31,15 @@ try
     //     Log.Information("Done seeding database. Exiting.");
     //     return;
     // }
-    SeedData.EnsureSeedData(app); //will seed only if there are no users yet
+
+    var retryPolicy = Policy
+        .Handle<NpgsqlException>()
+        .WaitAndRetry(5, retryAttempt => TimeSpan.FromSeconds(10));
+
+    //seed data
+    retryPolicy.ExecuteAndCapture( () => SeedData.EnsureSeedData(app));
+
+    //SeedData.EnsureSeedData(app); //will seed only if there are no users yet
 
     app.Run();
 }

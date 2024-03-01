@@ -1,5 +1,6 @@
 using System.Net;
 using MassTransit;
+using MongoDB.Driver;
 using Polly;
 using Polly.Extensions.Http;
 using SearchService;
@@ -31,6 +32,11 @@ builder.Services.AddMassTransit( options =>
   //set up default connection to RabbitMQ (localhost:5672)  
   options.UsingRabbitMq( (context,cfg) => 
   {
+    cfg.UseMessageRetry(r => {
+      r.Handle<RabbitMqConnectionException>();
+      r.Interval(5, TimeSpan.FromSeconds(10));
+    });
+
     //configure retry policy, specify RabbitMQ endpoint 
     cfg.ReceiveEndpoint("search-auction-created", e => 
     {
@@ -60,14 +66,19 @@ app.MapControllers();
 //initialize DB, create indexes, seed data
 app.Lifetime.ApplicationStarted.Register(
   async () => {
-    try 
-    {
-      await DbInitializer.InitDb(app);
-    }
-    catch(Exception e)
-    {
-      Console.WriteLine(e);
-    }
+    await Policy
+        .Handle<MongoException>()
+        .Or<TimeoutException>()
+        .WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(10))
+        .ExecuteAndCaptureAsync( () => DbInitializer.InitDb(app));
+    // try 
+    // {
+    //   await DbInitializer.InitDb(app);
+    // }
+    // catch(Exception e)
+    // {
+    //   Console.WriteLine(e);
+    // }
   }
 );
 

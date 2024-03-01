@@ -12,6 +12,11 @@ builder.Services.AddMassTransit( options => {
 
   options.UsingRabbitMq( (context,cfg) => 
   {
+    cfg.UseMessageRetry(r => {
+      r.Handle<RabbitMqConnectionException>();
+      r.Interval(5, TimeSpan.FromSeconds(10));
+    });
+        
     cfg.Host(builder.Configuration["RabbitMq:Host"], "/", host => {
       host.Username(builder.Configuration.GetValue("RabbitMq:Username","guest"));
       host.Password(builder.Configuration.GetValue("RabbitMq:Password","guest"));

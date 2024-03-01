@@ -5,6 +5,8 @@ using MassTransit;
 using AuctionService.Data;
 using AuctionService.Consumers;
 using AuctionService.Services;
+using Polly;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +38,11 @@ builder.Services.AddMassTransit( options => {
 
   options.UsingRabbitMq( (context,cfg) => 
   {
+    cfg.UseMessageRetry(r => {
+      r.Handle<RabbitMqConnectionException>();
+      r.Interval(5, TimeSpan.FromSeconds(10));
+    });
+    
     cfg.Host(builder.Configuration["RabbitMq:Host"], "/", host => {
       host.Username(builder.Configuration.GetValue("RabbitMq:Username","guest"));
       host.Password(builder.Configuration.GetValue("RabbitMq:Password","guest"));
@@ -66,16 +73,24 @@ app.MapControllers();
 
 app.MapGrpcService<GrpcAuctionService>();
 
+//create retry policy
+var retryPolicy = Policy
+  .Handle<NpgsqlException>()
+  .WaitAndRetry(5, retryAttempt => TimeSpan.FromSeconds(10));
+
 //apply migrations & seed data
-try
-{
-  app.InitDb();
-}
-catch(Exception e) 
-{
-  Console.WriteLine(e);
-  //throw;
-}
+retryPolicy.ExecuteAndCapture( () => app.InitDb());
+
+//apply migrations & seed data
+// try
+// {
+//   app.InitDb();
+// }
+// catch(Exception e) 
+// {
+//   Console.WriteLine(e);
+//   //throw;
+// }
 
 app.Run();
 
